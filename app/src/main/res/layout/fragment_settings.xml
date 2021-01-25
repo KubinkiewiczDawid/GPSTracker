@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SettingsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/record_path_button"
+            android:text="@string/sciezka_zapisu_plikow"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:orientation="horizontal">
+            <TextView
+                android:text="@string/predkosc_rozpoczecia_nagrywania"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"/>
+            <EditText
+                android:id="@+id/record_speed_start"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center"
+                android:hint="np. 100"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:orientation="horizontal">
+            <TextView
+                android:text="@string/czestotliwosc_zapisu"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"/>
+            <EditText
+                android:id="@+id/record_frequency"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center"
+                android:hint="np. 100"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gps_recorder_v_0_1"
+            android:textColor="#000000"
+            android:textSize="20sp"/>
+    </LinearLayout>
+</layout>

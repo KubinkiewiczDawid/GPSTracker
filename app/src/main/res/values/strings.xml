@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">GPSTracker</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="gps_recorder_v_0_1">GPS Recorder v.0.1</string>
+    <string name="sciezka_zapisu_plikow">Sciezka zapisu plikow</string>
+    <string name="predkosc_rozpoczecia_nagrywania">Predkosc rozpoczecia nagrywania (s)</string>
+    <string name="czestotliwosc_zapisu">Czestotliwosc zapisu (s)</string>
+    <string name="uruchom_w_tle">Uruchom w tle</string>
+    <string name="zatrzymaj">Zatrzymaj</string>
+    <string name="ustawienia">Ustawienia</string>
+</resources>

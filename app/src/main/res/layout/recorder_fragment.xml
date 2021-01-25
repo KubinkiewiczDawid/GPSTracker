@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".RecorderFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_location_on_24"
+            android:layout_gravity="center_horizontal"/>
+
+        <Button
+            android:id="@+id/recording_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uruchom_w_tle"
+            android:background="@drawable/yellow_box"
+            android:textAllCaps="false"
+            android:textSize="40sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp"/>
+        
+        <Button
+            android:id="@+id/settings_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="@string/ustawienia"
+            android:background="@drawable/grey_box"
+            android:textSize="20sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp"/>
+
+        <TextView
+            android:id="@+id/recording_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</layout>
