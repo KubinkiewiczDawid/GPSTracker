@@ -11,11 +11,20 @@
 
         <Button
             android:id="@+id/record_path_button"
-            android:text="@string/sciezka_zapisu_plikow"
+            android:text="@string/zmien_sciezke_zapisu_plikow"
             android:textAllCaps="false"
             android:textSize="20sp"
             android:layout_width="match_parent"
             android:layout_height="60dp"/>
+        <TextView
+            android:id="@+id/current_save_path"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="80dp"
@@ -30,13 +39,29 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"/>
             <EditText
-                android:id="@+id/record_speed_start"
+                android:id="@+id/record_speed_start_digit"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="center"
-                android:hint="np. 100"
-                android:inputType="number" />
+                android:inputType="number"
+                android:layout_weight="1"/>
+            <TextView
+                android:layout_width="15dp"
+                android:text="."
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|bottom"
+                android:gravity="center"
+                android:layout_marginBottom="10dp"/>
+            <EditText
+                android:id="@+id/record_speed_start_fraction"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:inputType="number"
+                android:layout_weight="1"/>
         </LinearLayout>
 
         <LinearLayout
@@ -61,6 +86,14 @@
                 android:hint="np. 100"
                 android:inputType="number" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/save_data_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:text="Zapisz ustawienia"/>
 
         <TextView
             android:layout_width="wrap_content"

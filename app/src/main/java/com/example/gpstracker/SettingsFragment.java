@@ -32,56 +32,65 @@ public class SettingsFragment extends Fragment {
 
     private MyViewModel mViewModel;
 
+    private int startRecordSpeedInt;
+    private int startRecordSpeedFraction;
+
+    private String dataPath;
+    private int recodFrequency;
+    private int startRecodSpeed;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 1. Initialize dialog
-        chooser = new StorageChooser.Builder()
-                // Specify context of the dialog
-                .withActivity(getActivity())
-                .withFragmentManager(((MainActivity)getActivity()).getFragmentManager())
-                .withMemoryBar(true)
-                .allowCustomPath(true)
-                // Define the mode as the FOLDER/DIRECTORY CHOOSER
-                .setType(StorageChooser.DIRECTORY_CHOOSER)
-                .build();
-
-// 2. Handle what should happend when the user selects the directory !
-        chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
-            @Override
-            public void onSelect(String path) {
-                // e.g /storage/emulated/0/Documents
-                mViewModel.setSavePath(path);
-                Log.i("Path: " , path);
-            }
-        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
-        mViewModel = new ViewModelProvider(this).get(MyViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(MyViewModel.class);
+        setupTextData();
         setupListeners();
         return binding.getRoot();
+    }
+
+    private void setupTextData() {
+        binding.currentSavePath.setText(mViewModel.getSavePath());
+        binding.recordSpeedStartDigit.setText(Integer.toString(mViewModel.getRecodSpeedInt()));
+        binding.recordSpeedStartFraction.setText(mViewModel.getRecodSpeedFraction());
+        binding.recordFrequency.setText(Integer.toString(mViewModel.getRecodeFrequency() / 1000));
     }
 
     private void setupListeners(){
         binding.recordPathButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooser.show();
+                RecorderFragment.showChooser();
             }
         });
 
-        binding.recordSpeedStart.addTextChangedListener(new TextWatcher() {
+        binding.recordSpeedStartDigit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length() != 0)
-                    mViewModel.setRecodeSpeed(Integer.parseInt(s.toString()));
+                    mViewModel.setRecodSpeedInt(Integer.parseInt(s.toString()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        binding.recordSpeedStartFraction.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() != 0)
+                    mViewModel.setRecodSpeedFraction(s.toString());
             }
 
             @Override
@@ -100,6 +109,14 @@ public class SettingsFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {}
+        });
+
+        binding.saveDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.reinitLocationListener();
+                Navigation.findNavController(v).popBackStack();
+            }
         });
     }
 }

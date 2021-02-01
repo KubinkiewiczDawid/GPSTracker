@@ -17,15 +17,27 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-public class MyViewModel extends AndroidViewModel implements SensorEventListener {
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Scanner;
+import java.util.TimeZone;
+
+public class MyViewModel extends AndroidViewModel {
 
     private LocationManager lm;
     private Location liveLoc;
     private Location prevLoc;
-
-    private SensorManager sensorManager;
-    private Sensor accelerometer;
-    private MutableLiveData<String> sensorDataLiveData;
 
     private boolean recordingLocation;
     public boolean getRecordingLocation(){
@@ -33,14 +45,6 @@ public class MyViewModel extends AndroidViewModel implements SensorEventListener
     }
     public void setRecordingLocation(boolean recordingLocation){
         this.recordingLocation = recordingLocation;
-    }
-
-
-    public LiveData<String> getCurrentSensorData() {
-        if (sensorDataLiveData == null) {
-            sensorDataLiveData = new MutableLiveData<>();
-        }
-        return sensorDataLiveData;
     }
 
     private MutableLiveData<String> locationLiveData;
@@ -52,25 +56,53 @@ public class MyViewModel extends AndroidViewModel implements SensorEventListener
         return locationLiveData;
     }
 
-    private int recodeFrequency;
+    private int recodeFrequency = 1000;
     public void setRecodeFrequency(int recodeFrequency){
         this.recodeFrequency = recodeFrequency * 1000;
-        if(recordingLocation)
-            registerLocationService();
+    }
+    public int getRecodeFrequency(){
+        return recodeFrequency;
     }
 
-    private int recodeSpeed = 5;
-    public void setRecodeSpeed(int recodeSpeed){
-        this.recodeSpeed = recodeSpeed;
+    private int recodSpeedInt = 5;
+    public void setRecodSpeedInt(int recodSpeedInt){
+        this.recodSpeedInt = recodSpeedInt;
+    }
+    public int getRecodSpeedInt(){
+        return recodSpeedInt;
+    }
+
+    private String recodSpeedFraction = "0";
+    public void setRecodSpeedFraction(String recodSpeedFraction){
+        this.recodSpeedFraction = recodSpeedFraction;
+    }
+    public String getRecodSpeedFraction(){
+        return recodSpeedFraction;
+    }
+
+    private double recodSpeed = 5;
+    public void setRecodSpeed(double recodSpeed){
+        this.recodSpeed = recodSpeed;
     }
 
     private String savePath;
     public void setSavePath(String savePath){
         this.savePath = savePath;
     }
+    public String getSavePath(){
+        return savePath;
+    }
 
     public MyViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public void reinitLocationListener(){
+        String decimalText = "0." + recodSpeedFraction;
+        setRecodSpeed(recodSpeedInt + (Double.parseDouble(decimalText)));
+        double x = recodSpeed;
+        if(recordingLocation)
+            registerLocationService();
     }
 
     @SuppressLint("MissingPermission")
@@ -100,20 +132,22 @@ public class MyViewModel extends AndroidViewModel implements SensorEventListener
             liveLoc.setLongitude(location.getLongitude());
 
             // obliczanie predkosci
-            float elapsedTimeInSeconds = 1; // sprawdzamy pozycje co sekunde
+            float elapsedTimeInSeconds = recodeFrequency == 0 ? 1000 : recodeFrequency; // sprawdzamy pozycje co sekunde
             float distanceInMeters = prevLoc.distanceTo(liveLoc); // dystans z poprzedniej pozycji do nowej
-            liveLoc.setSpeed((distanceInMeters / elapsedTimeInSeconds) > 350 ? 0 : (distanceInMeters / elapsedTimeInSeconds));
+            liveLoc.setSpeed((distanceInMeters / elapsedTimeInSeconds) > 1000 ? 0 : (distanceInMeters / elapsedTimeInSeconds));
 
+            Log.i("Location", "location read");
 
-            String msg = String.format("New Latitude: %.5f\nNew Longitude: %.5f\nMovement speed: %.5f",
-                    liveLoc.getLatitude(), liveLoc.getLongitude(), liveLoc.getSpeed());
+            if (liveLoc.getSpeed() >= recodSpeed) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                dateFormat.setTimeZone(TimeZone.getDefault());
+                String date = dateFormat.format(Calendar.getInstance().getTime());
+                String msg = String.format("New Latitude: %.5f\nNew Longitude: %.5f\nMovement speed: %.5f\n%s",
+                        liveLoc.getLatitude(), liveLoc.getLongitude(), liveLoc.getSpeed(), date);
 
-            Log.i("Location myViewModel", "location read");
-
-            locationLiveData.postValue(msg);
-            if (liveLoc.getSpeed() >= recodeSpeed) {
-                //tutaj zapis do pliku savePath
-                Log.i("Save path myViewModel", savePath == null ? getApplication().getApplicationInfo().dataDir : savePath);
+                locationLiveData.postValue("Trwa nagrywanie, ostatni zapis z " + date);
+                appendLog(msg);
+                Log.i("Save", savePath == null ? getApplication().getApplicationInfo().dataDir : savePath);
             }
         }
 
@@ -122,28 +156,35 @@ public class MyViewModel extends AndroidViewModel implements SensorEventListener
         }
     };
 
-    public void registerSensors(){
-        sensorManager = (SensorManager) getApplication().getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
-            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    private void appendLog(String text)
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+        String fileName = dateFormat.format(Calendar.getInstance().getTime()) + ".txt";
+        File logFile = new File(savePath, fileName);
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
-        sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    public void unregisterSensors(){
-        sensorManager.unregisterListener(this);
-    }
-
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
-            sensorDataLiveData.postValue(event.values[0] + " " + event.values[1] + " " + event.values[2]);
+        try
+        {
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.append("--------------------");
+            buf.newLine();
+            buf.close();
         }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 }
